@@ -1,0 +1,174 @@
+@import '../styles/Variables.scss';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: $background-color;
+}
+
+.header {
+  background-color: $primary-color;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.languageToggle {
+  background-color: $secondary-color;
+  color: black;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: darken($secondary-color, 10%);
+  }
+}
+
+.tabContainer {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tab {
+  flex: 1;
+  padding: 1rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s;
+
+  &.active {
+    color: $primary-color;
+    border-bottom: 2px solid $primary-color;
+  }
+
+  &:not(.active) {
+    color: #6b7280;
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+.main {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1rem;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 2rem;
+  }
+}
+
+.card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cardContent {
+  padding: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: $primary-color;
+  margin-bottom: 1rem;
+}
+
+.chartContainer {
+  aspect-ratio: 1 / 1;
+  max-width: 48rem;
+  margin: 0 auto 1.5rem;
+
+  @media (min-width: 768px) {
+    aspect-ratio: 4 / 3;
+  }
+
+  @media (min-width: 1024px) {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.infoSection {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.infoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.totalInfo {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.lastUpdated {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.insights {
+  background-color: $background-color;
+  padding: 1.5rem;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+
+.insightsTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.insightsList {
+  list-style-type: disc;
+  list-style-position: inside;
+  font-size: 0.875rem;
+  color: #4b5563;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}

@@ -1,0 +1,68 @@
+@import '../styles/Variables.scss';
+
+.recentReports {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $primary-color;
+  margin-bottom: 1rem;
+}
+
+.noReports {
+  font-style: italic;
+  color: #6b7280;
+}
+
+.reportGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.reportCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.reportImage {
+  width: 100%;
+  height: 150px;
+  position: relative;
+
+  img {
+    object-fit: cover;
+  }
+}
+
+.reportContent {
+  padding: 1rem;
+}
+
+.reportCategory {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: $primary-color;
+  margin-bottom: 0.5rem;
+}
+
+.reportLocation {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.reportDescription {
+  font-size: 1rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.reportTimestamp {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}

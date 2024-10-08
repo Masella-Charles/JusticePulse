@@ -1,0 +1,166 @@
+
+.appContainer {
+  font-family: 'Ubuntu', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.appTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.languageToggle {
+  background-color: var(--secondary-color);
+  color: black;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.searchBar {
+  margin: 1rem;
+  position: relative;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #ccc;
+  border-radius: 9999px;
+  font-size: 1rem;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+.actionButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+.actionButton {
+  padding: 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.reportIssue, .findLegalAid {
+  background-color: var(--accent-color);
+}
+
+.signPetition {
+  background-color: var(--secondary-color);
+  color: black;
+}
+
+.viewProjects {
+  background-color: var(--primary-color);
+}
+
+.recentActivity {
+  background-color: white;
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.activityTitle {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.activityItem {
+  margin-bottom: 1rem;
+}
+
+.activityItem h4 {
+  color: var(--primary-color);
+  margin: 0 0 0.25rem 0;
+}
+
+.activityItem p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.activityItem span {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.navBar {
+  background-color: white;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #888;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.navItem.active {
+  color: var(--primary-color);
+}
+
+.navIcon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.imgRounded {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.imgPositioned {
+  position: absolute;
+  width: 2rem; /* h-2 */
+  height: 2rem; /* w-2 */
+  background-color: white; /* bg-white */
+}
+.appTitleText {
+  margin: 4rem;
+  align-items: center;
+}
