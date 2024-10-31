@@ -1,0 +1,114 @@
+/* Admin Page Styles */
+
+/* General Layout */
+.admin-container {
+  @apply mx-auto flex max-w-7xl flex-col space-y-14 px-4 py-8 sm:px-6 lg:px-8;
+}
+
+/* Header Styles */
+.admin-header {
+  @apply flex items-center justify-between border-b border-gray-200 pb-5;
+}
+
+.admin-logo {
+  @apply h-8 w-auto rounded-md;
+}
+
+.admin-title {
+  @apply text-16 font-semibold text-gray-900;
+}
+
+/* Main Content Styles */
+.admin-main {
+  @apply space-y-10;
+}
+
+.admin-welcome {
+  @apply space-y-4;
+}
+
+.admin-welcome h1 {
+  @apply text-3xl font-bold text-gray-900 sm:text-4xl;
+}
+
+.admin-welcome p {
+  @apply text-xl text-gray-500;
+}
+
+/* Stats Section */
+.admin-stats {
+  @apply grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+/* Table Sections */
+.admin-table-section {
+  @apply space-y-6;
+}
+
+.admin-table-title {
+  @apply text-2xl font-bold text-gray-900;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .admin-header {
+    @apply flex-col items-start space-y-4;
+  }
+
+  .admin-title {
+    @apply mt-2;
+  }
+
+  .admin-welcome h1 {
+    @apply text-2xl;
+  }
+
+  .admin-welcome p {
+    @apply text-lg;
+  }
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .admin-container {
+    @apply bg-gray-900;
+  }
+
+  .admin-header {
+    @apply border-gray-700;
+  }
+
+  .admin-title,
+  .admin-welcome h1,
+  .admin-table-title {
+    @apply text-white;
+  }
+
+  .admin-welcome p {
+    @apply text-gray-300;
+  }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar {
+  @apply scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100;
+}
+
+/* Hover Effects */
+.hover-effect {
+  @apply transition duration-300 ease-in-out;
+}
+
+.hover-effect:hover {
+  @apply transform scale-105;
+}
