@@ -34,11 +34,14 @@ export default function RootLayout({
               position: 'fixed',
               right: '30px',
               zIndex: 1000,
-              color: "yellow"
+              color: "limegreen",
+              fontWeight: "bold",
+              borderRadius: 11,
+              backgroundColor: "lightgoldenrodyellow"
             }}>
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                  <button className="px-4 py-2 bg-lime-400  text-white rounded-md hover:bg-blue-700 transition-colors">
                     Sign In
                   </button>
                 </SignInButton>

@@ -207,8 +207,9 @@ export default function CreatePetition({ currentLanguage, onClose }: CreatePetit
                 id="goal"
                 value={petitionData.goal}
                 onChange={handleInputChange}
-                min={100}
+                min={100}             
                 required
+                className='m-1 bg-red-400'
               />
             </div>
             <div className={styles.inputWrapper}>

@@ -1,0 +1,29 @@
+{
+    "databases": [
+        {
+            "$id": "67078345000da7c5ec51",
+            "name": "JusticePulse",
+            "enabled": true
+        }
+    ],
+    "collections": [
+        {
+            "$id": "67078345000dfc2ee9f3",
+            "databaseId": "67078345000da7c5ec51",
+            "name": "report",
+            "documentSecurity": false,
+            "attributes": [],
+            "indexes": [],
+            "enabled": true
+        },
+        {
+            "$id": "670790cb00033e1b9b76",
+            "databaseId": "67078345000da7c5ec51",
+            "name": "reports",
+            "documentSecurity": false,
+            "attributes": [],
+            "indexes": [],
+            "enabled": true
+        }
+    ]
+}
