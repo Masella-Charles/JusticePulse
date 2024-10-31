@@ -11,6 +11,7 @@ import { SuccessPage } from './SuccessPage'
 import { PETITION_COLLECTION_ID } from '@/lib/appwrite.config'
 
 
+
 // Initialize Appwrite client
 const client = new Client()
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!) 
@@ -21,14 +22,14 @@ const client = new Client()
 const databases = new Databases(client);
 const storage = new Storage(client);
 
-
 interface Petition {
-  id: number
-  title: string
-  signatures: number
-  goal: number
-  stage: 'trending' | 'victory' | 'urgent'
+  name: string
   description: string
+  goal: number
+  category: string
+  location: string
+  createdAt: string
+  stage: 'trending' | 'urgent' | 'victory'
 }
 
 export function CivicEngagement() {
@@ -146,23 +147,47 @@ export function CivicEngagement() {
     }
 };
 
-  
+const handleSubmitPetition = async (petitionData: Omit<Petition, 'createdAt'>) => {
 
-  const handleSubmitPetition = async (petitionData) => {
-    console.log("Submitting petition:", petitionData);
-  
-    try {
-      const response = await CreatePetition(petitionData);
-      console.log("Petition submitted successfully:", response);
-  
-      setSuccessType('petition');
-      setShowSuccessPage(true);
-    } catch (error) {
-      console.error("Error submitting petition:", error);
-      // Handle error (show message to user, etc.)
+  const REPORT_COLLECTION_ID = process.env.NEXT_PUBLIC_REPORT_COLLECTION_ID!;
+
+  try {
+    // Validate required fields
+    if (!petitionData.name || !petitionData.description || !petitionData.goal || !petitionData.category || !petitionData.location || !petitionData.stage) {
+      alert("Please fill in all required fields.");
+      return;
     }
-  };
-  
+
+    // Prepare the petition data
+    const petition = {
+      ...petitionData,
+      createdAt: new Date().toISOString(),
+    };
+
+    // Use the Appwrite client to create a new document in your collection
+    const response = await databases.createDocument(
+      process.env.NEXT_PUBLIC_DATABASE_ID!,
+      REPORT_COLLECTION_ID,
+      ID.unique(),
+      petition
+    );
+
+    console.log("Petition submitted successfully:", response);
+
+    // Add the new petition to the local state without creating a new document
+    const newPetition = {
+      ...petition,
+      id: response.$id,
+    };
+    addNewPetition(newPetition);
+
+    setSuccessType('petition');
+    setShowSuccessPage(true);
+  } catch (error) {
+    console.error("Error submitting petition:", error);
+    alert(`There was an error submitting your petition: ${(error as Error).message || error}`);
+  }
+};
 
   const renderPetitionDetails = (petition: Petition) => (
     <div className={styles.cardContent}>

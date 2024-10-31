@@ -1,39 +1,50 @@
 'use client'
 
-import React, { useState, useEffect, useContext } from 'react'
-import { X, ChevronLeft, ChevronRight, ClipboardCheck, Flag, Globe, Home, Info } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { X, ChevronLeft, ChevronRight, ClipboardCheck } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Tooltip } from '@/components/ui/tooltip'
 import styles from './CreatePetition.module.scss'
-import { PetitionContext } from '../ PetitionContext'
+import { Client, Databases, ID } from "appwrite"
+
+// Initialize Appwrite client
+const client = new Client()
+  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!) 
+  .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!)
+
+const databases = new Databases(client)
 
 interface CreatePetitionProps {
   currentLanguage: string
   onClose: () => void
+  onSubmit: (petition: Petition) => void
 }
 
-export default function CreatePetition({ currentLanguage, onClose }: CreatePetitionProps) {
-  const context = useContext(PetitionContext)
+interface Petition {
+  name: string
+  description: string
+  goal: number
+  category: string
+  location: string
+  createdAt: string
+  stage: 'trending' | 'urgent' | 'victory'
+}
 
-  if (!context) {
-    throw new Error('CreatePetition must be used within a PetitionProvider')
-  }
-
-  const { addNewPetition } = context
-
+export default function CreatePetition({ currentLanguage, onClose, onSubmit }: CreatePetitionProps) {
   const [step, setStep] = useState(1)
-  const [petitionData, setPetitionData] = useState({
-    scope: '',
-    title: '',
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [petitionData, setPetitionData] = useState<Petition>({
+    name: '',
     description: '',
-    signatures: 0,
     goal: 1000,
+    category: '',
+    location: '',
+    createdAt: '',
     stage: 'trending'
   })
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   
-  const totalSteps = 3
+  const totalSteps = 2
 
   useEffect(() => {
     const savedPetitionData = localStorage.getItem('petitionData')
@@ -48,18 +59,16 @@ export default function CreatePetition({ currentLanguage, onClose }: CreatePetit
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setPetitionData(prev => ({ ...prev, [name]: value }))
+    setPetitionData(prev => ({ 
+      ...prev, 
+      [name]: name === 'goal' ? parseInt(value, 10) || 0 : value 
+    }))
     setErrorMessage('')
   }
 
-  const handleScopeSelect = (scope: string) => {
-    setPetitionData(prev => ({ ...prev, scope }))
-    setStep(2)
-  }
-
   const handleNext = () => {
-    if (step === 2 && petitionData.title.length < 5) {
-      setErrorMessage(currentLanguage === 'en' ? 'Title must be at least 5 characters long.' : 'Kichwa kinapaswa kuwa na herufi 5 au zaidi.')
+    if (step === 1 && (!petitionData.name || !petitionData.category || !petitionData.location)) {
+      setErrorMessage(currentLanguage === 'en' ? 'Name, category, and location are required.' : 'Jina, kategoria, na eneo zinahitajika.')
       return
     }
     if (step < totalSteps) {
@@ -74,47 +83,70 @@ export default function CreatePetition({ currentLanguage, onClose }: CreatePetit
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!petitionData.scope || !petitionData.title || !petitionData.description) {
+    if (isSubmitting) {
+      return
+    }
+
+    if (!petitionData.name || !petitionData.description || !petitionData.category || !petitionData.location) {
       setErrorMessage(currentLanguage === 'en' ? 'All fields are required.' : 'Sehemu zote zinahitajika.')
       return
     }
 
-    const newPetition = {
-      id: Date.now(),
-      title: petitionData.title,
-      signatures: petitionData.signatures,
-      goal: petitionData.goal,
-      stage: petitionData.stage as 'trending' | 'victory' | 'urgent',
-      description: petitionData.description,
-      scope: petitionData.scope
+    try {
+      setIsSubmitting(true)
+      const REPORT_COLLECTION_ID = process.env.NEXT_PUBLIC_REPORT_COLLECTION_ID!
+
+      const petition = {
+        ...petitionData,
+        goal: Math.max(0, Math.floor(petitionData.goal)),
+        createdAt: new Date().toISOString(),
+      }
+
+      const response = await databases.createDocument(
+        process.env.NEXT_PUBLIC_DATABASE_ID!,
+        REPORT_COLLECTION_ID,
+        ID.unique(),
+        petition
+      )
+
+      console.log('Petition submitted:', response)
+      console.log('Using collection ID:', REPORT_COLLECTION_ID)
+
+      onSubmit(petition)
+
+      localStorage.removeItem('petitionData')
+      setSuccessMessage(currentLanguage === 'en' ? 'Petition submitted successfully!' : 'Ombi limewasilishwa kwa mafanikio!')
+      setTimeout(() => {
+        setSuccessMessage('')
+        onClose()
+      }, 3000)
+    } catch (error) {
+      console.error('Error submitting petition:', error)
+      setErrorMessage(currentLanguage === 'en' ? `An error occurred while submitting the petition: ${error.message || error}` : `Hitilafu imetokea wakati wa kuwasilisha ombi: ${error.message || error}`)
+    } finally {
+      setIsSubmitting(false)
     }
-
-    addNewPetition(newPetition)
-
-    console.log('Petition submitted:', newPetition)
-    localStorage.removeItem('petitionData')
-    setSuccessMessage(currentLanguage === 'en' ? 'Petition submitted successfully!' : 'Ombi limewasilishwa kwa mafanikio!')
-    setTimeout(() => {
-      setSuccessMessage('')
-      onClose()
-    }, 3000)
   }
 
   const handleReset = () => {
     setPetitionData({
-      scope: '',
-      title: '',
+      name: '',
       description: '',
-      signatures: 0,
       goal: 1000,
-      stage: 'trending'
+      category: '',
+      location: '',
+      createdAt: '',
+      stage: 'trending',
     })
     setStep(1)
     setErrorMessage('')
   }
+
+  // Rest of the component remains the same...
+  // (Previous render logic for steps and form)
 
   const renderStepContent = () => {
     switch (step) {
@@ -126,27 +158,43 @@ export default function CreatePetition({ currentLanguage, onClose }: CreatePetit
             exit={{ opacity: 0, x: -50 }}
             className={styles.step}
           >
-            <h2>{currentLanguage === 'en' ? "Let's take your first step toward change" : "Tuchukue hatua yako ya kwanza kuelekea mabadiliko"}</h2>
-            <p>{currentLanguage === 'en' ? "Select the scope of your petition:" : "Chagua upeo wa ombi lako:"}</p>
-            <div className={styles.scopeButtons}>
-              <Tooltip content={currentLanguage === 'en' ? "For local issues in your community" : "Kwa masuala ya mtaa katika jamii yako"}>
-                <button type="button" onClick={() => handleScopeSelect('local')} className={petitionData.scope === 'local' ? styles.active : ''}>
-                  <Home className="h-5 w-5 mr-2" />
-                  {currentLanguage === 'en' ? "Local" : "Mtaa"}
-                </button>
-              </Tooltip>
-              <Tooltip content={currentLanguage === 'en' ? "For issues affecting your country" : "Kwa masuala yanayoathiri nchi yako"}>
-                <button type="button" onClick={() => handleScopeSelect('national')} className={petitionData.scope === 'national' ? styles.active : ''}>
-                  <Flag className="h-5 w-5 mr-2" />
-                  {currentLanguage === 'en' ? "National" : "Kitaifa"}
-                </button>
-              </Tooltip>
-              <Tooltip content={currentLanguage === 'en' ? "For issues with worldwide impact" : "Kwa masuala yenye athari za kimataifa"}>
-                <button type="button" onClick={() => handleScopeSelect('global')} className={petitionData.scope === 'global' ? styles.active : ''}>
-                  <Globe className="h-5 w-5 mr-2" />
-                  {currentLanguage === 'en' ? "Global" : "Kimataifa"}
-                </button>
-              </Tooltip>
+            <h2>{currentLanguage === 'en' ? "Basic Information" : "Taarifa za Msingi"}</h2>
+            <div className={styles.inputWrapper}>
+              <label htmlFor="name">{currentLanguage === 'en' ? "Petition Name" : "Jina la Ombi"}</label>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                value={petitionData.name}
+                onChange={handleInputChange}
+                placeholder={currentLanguage === 'en' ? "Enter petition name" : "Ingiza jina la ombi"}
+                required
+                maxLength={100}
+              />
+            </div>
+            <div className={styles.inputWrapper}>
+              <label htmlFor="category">{currentLanguage === 'en' ? "Category" : "Kategoria"}</label>
+              <input
+                type="text"
+                name="category"
+                id="category"
+                value={petitionData.category}
+                onChange={handleInputChange}
+                required
+                placeholder={currentLanguage === 'en' ? "Enter petition category" : "Ingiza kategoria ya ombi"}
+              />
+            </div>
+            <div className={styles.inputWrapper}>
+              <label htmlFor="location">{currentLanguage === 'en' ? "Location" : "Eneo"}</label>
+              <input
+                type="text"
+                name="location"
+                id="location"
+                value={petitionData.location}
+                onChange={handleInputChange}
+                required
+                placeholder={currentLanguage === 'en' ? "Enter petition location" : "Ingiza eneo la ombi"}
+              />
             </div>
           </motion.div>
         )
@@ -158,46 +206,18 @@ export default function CreatePetition({ currentLanguage, onClose }: CreatePetit
             exit={{ opacity: 0, x: -50 }}
             className={styles.step}
           >
-            <h2>{currentLanguage === 'en' ? "Write your petition title" : "Andika kichwa cha ombi lako"}</h2>
-            <p>{currentLanguage === 'en' ? "Tell people what you want to change." : "Waambie watu unachotaka kubadilisha."}</p>
+            <h2>{currentLanguage === 'en' ? "Additional Details" : "Maelezo ya Ziada"}</h2>
             <div className={styles.inputWrapper}>
-              <input
-                type="text"
-                name="title"
-                value={petitionData.title}
-                onChange={handleInputChange}
-                placeholder={currentLanguage === 'en' ? "Enter petition title" : "Ingiza kichwa cha ombi"}
-                required
-                maxLength={100}
-              />
-              <Tooltip content={currentLanguage === 'en' ? "Be clear and concise" : "Kuwa wazi na mafupi"}>
-                <Info className={styles.infoIcon} />
-              </Tooltip>
-            </div>
-            <p className={styles.charCount}>{petitionData.title.length}/100</p>
-          </motion.div>
-        )
-      case 3:
-        return (
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            className={styles.step}
-          >
-            <h2>{currentLanguage === 'en' ? "Describe the change you want to make" : "Eleza mabadiliko unayotaka kufanya"}</h2>
-            <div className={styles.inputWrapper}>
+              <label htmlFor="description">{currentLanguage === 'en' ? "Description" : "Maelezo"}</label>
               <textarea
                 name="description"
+                id="description"
                 value={petitionData.description}
                 onChange={handleInputChange}
                 placeholder={currentLanguage === 'en' ? "Explain why this change is important..." : "Eleza kwa nini mabadiliko haya ni muhimu..."}
                 required
                 rows={5}
               />
-              <Tooltip content={currentLanguage === 'en' ? "Provide context and reasons" : "Toa muktadha na sababu"}>
-                <Info className={styles.infoIcon} />
-              </Tooltip>
             </div>
             <div className={styles.inputWrapper}>
               <label htmlFor="goal">{currentLanguage === 'en' ? "Signature Goal" : "Lengo la Sahihi"}</label>
@@ -207,9 +227,9 @@ export default function CreatePetition({ currentLanguage, onClose }: CreatePetit
                 id="goal"
                 value={petitionData.goal}
                 onChange={handleInputChange}
-                min={100}             
+                min={1}
+                step={1}
                 required
-                className='m-1 bg-red-400'
               />
             </div>
             <div className={styles.inputWrapper}>
@@ -305,7 +325,7 @@ export default function CreatePetition({ currentLanguage, onClose }: CreatePetit
             ) : (
               <>
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05  }}
                   whileTap={{ scale: 0.95 }}
                   type="submit"
                   className={styles.submitButton}

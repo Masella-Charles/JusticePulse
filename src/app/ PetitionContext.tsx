@@ -1,36 +1,64 @@
-import React, { createContext, useState, ReactNode } from 'react'
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface Petition {
-  id: number
-  title: string
-  signatures: number
-  goal: number
-  stage: 'trending' | 'victory' | 'urgent'
-  description: string
-  scope: string
+  title: string;
+  description: string;
+  goal: number;
+  category: string;
+  createdAt: string;
+  stage: 'trending' | 'urgent' | 'victory';
 }
 
 interface PetitionContextType {
-  petitions: Petition[]
-  addNewPetition: (petition: Petition) => void
+  petitions: Petition[];
+  addNewPetition: (petition: Petition) => void;
+  updatePetition: (id: string, updatedPetition: Partial<Petition>) => void;
+  deletePetition: (id: string) => void;
 }
 
-export const PetitionContext = createContext<PetitionContextType | null>(null)
+const PetitionContext = createContext<PetitionContextType | undefined>(undefined);
+
+export const usePetitionContext = () => {
+  const context = useContext(PetitionContext);
+  if (context === undefined) {
+    throw new Error('usePetitionContext must be used within a PetitionProvider');
+  }
+  return context;
+};
 
 interface PetitionProviderProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export const PetitionProvider: React.FC<PetitionProviderProps> = ({ children }) => {
-  const [petitions, setPetitions] = useState<Petition[]>([])
+  const [petitions, setPetitions] = useState<Petition[]>([]);
 
   const addNewPetition = (petition: Petition) => {
-    setPetitions(prevPetitions => [...prevPetitions, petition])
-  }
+    setPetitions((prevPetitions) => [...prevPetitions, petition]);
+  };
 
-  return (
-    <PetitionContext.Provider value={{ petitions, addNewPetition }}>
-      {children}
-    </PetitionContext.Provider>
-  )
-}
+  const updatePetition = (id: string, updatedPetition: Partial<Petition>) => {
+    setPetitions((prevPetitions) =>
+      prevPetitions.map((petition) =>
+        petition.id === id ? { ...petition, ...updatedPetition } : petition
+      )
+    );
+  };
+
+  const deletePetition = (id: string) => {
+    setPetitions((prevPetitions) =>
+      prevPetitions.filter((petition) => petition.id !== id)
+    );
+  };
+
+  const value: PetitionContextType = {
+    petitions,
+    addNewPetition,
+    updatePetition,
+    deletePetition,
+  };
+
+  return <PetitionContext.Provider value={value}>{children}</PetitionContext.Provider>;
+};
+
+export { PetitionContext };
